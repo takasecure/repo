@@ -3,9 +3,9 @@ entries:
   taka-auth:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-10-25T13:25:23.634584882Z"
+    created: "2025-10-25T13:33:29.243399225Z"
     description: A Helm chart for Kubernetes
-    digest: afe5b953f63ba140cc107fc3408b16e1d0ad9f1bf39d0b7cf2fa7ebee016c582
+    digest: 2be0ae4e15d9b11b0ae1b1a5eac602fe050e50db78ae772c7d885c8d45d36ce5
     name: taka-auth
     type: application
     urls:
@@ -14,9 +14,9 @@ entries:
   taka-backup:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-10-25T13:25:23.635073597Z"
+    created: "2025-10-25T13:33:29.243952491Z"
     description: A Helm chart for Kubernetes
-    digest: cc4364dbfb71e51009c6df3b9de358882da6870edc5cf016b53b54a03a71540e
+    digest: 62ab9bcb3a07dbc0f298390481663e5a0957b07051e1dffd9f93fa5f0903c9e5
     name: taka-backup
     type: application
     urls:
@@ -25,9 +25,9 @@ entries:
   taka-crypto:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-10-25T13:25:23.635804466Z"
+    created: "2025-10-25T13:33:29.244489445Z"
     description: A Helm chart for Kubernetes
-    digest: a4dcbd594ec5edfeb2824c5e9a4916c08ee3bfc67a935a162f42482bb5af10a9
+    digest: b599b0e0387b51bd7a978cb9abe54c5e72952ccfb76a820c7625ee4916c5183b
     name: taka-crypto
     type: application
     urls:
@@ -36,9 +36,9 @@ entries:
   taka-dispatch:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-10-25T13:25:23.636936295Z"
+    created: "2025-10-25T13:33:29.244996814Z"
     description: A Helm chart for Kubernetes
-    digest: 4480f161f65f50a5e40425afee7a93866d663f3b38b18a6db1bcbc4919bd5bfa
+    digest: 4568f187204f69b47bf961cc28c2e5699fdbd27deaaf91125345f243f72de3f1
     name: taka-dispatch
     type: application
     urls:
@@ -47,9 +47,9 @@ entries:
   taka-gateway:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-10-25T13:25:23.637422226Z"
+    created: "2025-10-25T13:33:29.245478335Z"
     description: A Helm chart for Kubernetes
-    digest: 8075096fb160749b547cbf5917342c2cf36e7d4d9443bb7dfa9ab6ac2147cb26
+    digest: 5aafa59656dc7b965811df7183590931656c6256ecc81e4bc0b3b598210f384f
     name: taka-gateway
     type: application
     urls:
@@ -58,12 +58,12 @@ entries:
   taka-masking:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-10-25T13:25:23.637882608Z"
+    created: "2025-10-25T13:33:29.246152476Z"
     description: A Helm chart for Kubernetes
-    digest: 91bf5f05faba1794fdf10f450206ff61cff9e07690c288337ea944b0ed0c879a
+    digest: c57fa460eab928be852cc3deec930863945b587940b35961388031e6f6906240
     name: taka-masking
     type: application
     urls:
     - https://takasecure.github.io/repo/charts/taka-masking-1.0.0.tgz
     version: 1.0.0
-generated: "2025-10-25T13:25:23.633923102Z"
+generated: "2025-10-25T13:33:29.242743449Z"
