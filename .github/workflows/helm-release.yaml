@@ -20,10 +20,7 @@ jobs:
       - name: Package all Helm charts from src/
         run: |
           mkdir -p charts
-          # Clean old tgz files (optional)
           find charts -name "*.tgz" -type f -delete
-
-          # Package every chart under src/
           for chart in src/*/; do
             echo "Packaging $chart ..."
             helm package "$chart" -d charts/
@@ -44,4 +41,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add charts/
-          git diff --quiet && echo "No changes to commit" || (git commit -m "Update packaged Helm charts" && git push)
+          if ! git diff --cached --quiet; then
+            git commit -m "Update packaged Helm charts"
+            git push
+          else
+            echo "No changes to commit"
+          fi
