@@ -99,6 +99,25 @@ install_docker() {
     echo -e "${GREEN}Docker and Docker Compose installed successfully${NC}"
 }
 
+# Validation functions
+validate_email() {
+    local email=$1
+    if [[ "$email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+validate_port() {
+    local port=$1
+    if [[ "$port" =~ ^[0-9]+$ ]] && [ "$port" -ge 1 ] && [ "$port" -le 65535 ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Function to get user input
 get_credentials() {
     echo -e "${YELLOW}Please provide the following credentials:${NC}"
@@ -184,24 +203,7 @@ get_credentials() {
     print_info "SMTP Configuration Setup"
     echo "════════════════════════════════════════════════════════"
     echo ""
-    # Validation functions
-    validate_email() {
-        local email=$1
-        if [[ "$email" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
-            return 0
-        else
-            return 1
-        fi
-    }
 
-    validate_port() {
-        local port=$1
-        if [[ "$port" =~ ^[0-9]+$ ]] && [ "$port" -ge 1 ] && [ "$port" -le 65535 ]; then
-            return 0
-        else
-            return 1
-        fi
-    }
     # SMTP Host
     while [ -z "$SMTP_HOST" ]; do
         read -p "SMTP Host (e.g., smtp.gmail.com): " SMTP_HOST
@@ -266,38 +268,38 @@ get_credentials() {
             print_error "SMTP Sender Name cannot be empty"
         fi
     done
-}
-print_info "JWT Secret Configuration"
-echo "════════════════════════════════════════════════════════"
 
-# Prompt for SERVICE_JWT_SECRET
-while [ -z "$SERVICE_JWT_SECRET" ]; do
-    read -p "Enter SERVICE_JWT_SECRET: " SERVICE_JWT_SECRET
-    if [ -z "$SERVICE_JWT_SECRET" ]; then
-        print_error "JWT secret cannot be empty."
-    elif [ ${#SERVICE_JWT_SECRET} -lt 50 ]; then
-        print_warning "Warning: The JWT secret seems shorter than expected (${#SERVICE_JWT_SECRET} characters)."
-        read -p "Are you sure you want to use it? (y/N): " confirm
-        if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
-            SERVICE_JWT_SECRET=""
+    print_info "JWT Secret Configuration"
+    echo "════════════════════════════════════════════════════════"
+
+    # Prompt for SERVICE_JWT_SECRET
+    while [ -z "$SERVICE_JWT_SECRET" ]; do
+        read -p "Enter SERVICE_JWT_SECRET: " SERVICE_JWT_SECRET
+        if [ -z "$SERVICE_JWT_SECRET" ]; then
+            print_error "JWT secret cannot be empty."
+        elif [ ${#SERVICE_JWT_SECRET} -lt 50 ]; then
+            print_warning "Warning: The JWT secret seems shorter than expected (${#SERVICE_JWT_SECRET} characters)."
+            read -p "Are you sure you want to use it? (y/N): " confirm
+            if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+                SERVICE_JWT_SECRET=""
+            fi
         fi
+    done
+
+    # Mask the JWT Secret for confirmation (show first and last 5 chars only)
+    MASKED_SECRET="$(echo "$SERVICE_JWT_SECRET" | awk '{print substr($0,1,5)"...("length($0)" chars)... "substr($0,length($0)-5,6)}')"
+
+    # Confirm the secret
+    echo ""
+    print_info "Preview (masked): $MASKED_SECRET"
+    read -p "Confirm saving this JWT secret? (Y/n): " save_confirm
+    save_confirm=${save_confirm:-Y}
+
+    if [ "$save_confirm" != "Y" ] && [ "$save_confirm" != "y" ]; then
+        print_info "Operation cancelled."
+        exit 0
     fi
-done
-
-# Mask the JWT Secret for confirmation (show first and last 5 chars only)
-MASKED_SECRET="$(echo "$SERVICE_JWT_SECRET" | awk '{print substr($0,1,5)"...("length($0)" chars)... "substr($0,length($0)-5,6)}')"
-
-# Confirm the secret
-echo ""
-print_info "Preview (masked): $MASKED_SECRET"
-read -p "Confirm saving this JWT secret? (Y/n): " save_confirm
-save_confirm=${save_confirm:-Y}
-
-if [ "$save_confirm" != "Y" ] && [ "$save_confirm" != "y" ]; then
-    print_info "Operation cancelled."
-    exit 0
-fi
-
+}
 save_dockerfile_website() {
     echo -e "${BLUE}Creating Dockerfile for Website ...${NC}"
     cat > $INSTALL_DIR/Dockerfile <<EOF
