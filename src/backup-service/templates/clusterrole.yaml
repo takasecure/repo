@@ -1,0 +1,12 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "taka-backup.fullname" . }}-{{ .Release.Namespace }}-clusterrole
+  labels:
+    {{- include "taka-backup.labels" . | nindent 4 }}
+rules:
+  {{- with .Values.rbac.data }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}  
+{{- end }}

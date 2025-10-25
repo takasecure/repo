@@ -1,0 +1,24 @@
+{{- if .Values.configMap.enabled }}
+{{- $dot := . }}
+{{- range $key, $value := .Values.configMap.data }}
+{{- if (not $value.existingConfig) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $value.name }}-taka-backup
+  labels:
+    app: {{ include "taka-backup.fullname" $ }}
+    chart: "{{ $dot.Chart.Name }}-{{ $dot.Chart.Version }}"
+    release: "{{ $dot.Release.Name }}"
+    heritage: "{{ $dot.Release.Service }}"
+{{- with $value.data }}
+data:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+---
+{{- end }}
+{{- end }}
+{{- end }}
+
+
+

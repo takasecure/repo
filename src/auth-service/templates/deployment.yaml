@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "taka-auth.fullname" . }}
+  labels:
+    {{- include "taka-auth.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "taka-auth.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "taka-auth.labels" . | nindent 8 }}
+	{{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "taka-auth.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.application.enabled }}
+          env:
+            {{- toYaml .Values.application.env | nindent 12 }}
+          {{- end }}
+          {{- with .Values.container.ports }}
+          ports:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.probe.enabled }}
+          livenessProbe:
+            {{- toYaml .Values.probe.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.probe.readinessProbe | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- if or .Values.configMap.enabled .Values.persistence.enabled }}
+          volumeMounts:
+          {{- if .Values.persistence.data }}
+          {{- range $key, $value := .Values.persistence.data }}
+            - name: {{ $value.name }}-taka-auth
+              mountPath: {{ $value.mountPath }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.configMap.data }}
+          {{- range $key, $value := .Values.configMap.data }}
+            - name: {{ $value.name }}-taka-auth
+              mountPath: {{ $value.mountPath }}
+              subPath: {{ $value.subPath }}
+              readOnly: {{ $value.readOnly }}
+          {{- end }}    
+          {{- end }}
+          {{- end }}
+      {{- if .Values.nodeSelector.enabled -}}
+      {{- with .Values.nodeSelector.select }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if or .Values.configMap.enabled .Values.persistence.enabled }}
+      volumes:
+      {{- if .Values.persistence.data }}
+      {{- range $key, $value := .Values.persistence.data }}
+        - name: {{ $value.name }}-taka-auth
+          persistentVolumeClaim:
+            claimName: {{ $value.name }}-taka-auth
+      {{- end }}
+      {{- end }}
+      {{- if .Values.configMap.data }}
+      {{- range $key, $value := .Values.configMap.data }}
+        - name: {{ $value.name }}-taka-auth
+          configMap:
+            name: {{ $value.name }}-taka-auth
+      {{- end }}
+      {{- end }}
+      {{- end }}

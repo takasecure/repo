@@ -1,0 +1,45 @@
+name: Package and Publish Helm Charts
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: latest
+
+      - name: Package all Helm charts from src/
+        run: |
+          mkdir -p charts
+          # Clean old tgz files (optional)
+          find charts -name "*.tgz" -type f -delete
+
+          # Package every chart under src/
+          for chart in src/*/; do
+            echo "Packaging $chart ..."
+            helm package "$chart" -d charts/
+          done
+
+      - name: Generate (or update) Helm repo index
+        run: |
+          cd charts
+          helm repo index . \
+            --url https://takasecure.github.io/repo/charts \
+            --merge index.yaml || true
+          cd ..
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add charts/
+          git diff --quiet && echo "No changes to commit" || (git commit -m "Update packaged Helm charts" && git push)

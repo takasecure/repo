@@ -1,0 +1,47 @@
+apiVersion: v1
+entries:
+  taka-auth:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-10-25T19:18:13.268076022+07:00"
+    description: A Helm chart for Kubernetes
+    digest: d375ab94bf2843d636854ebbb4ff269d1e28ed3f55833b58bb956eb7dc8b739f
+    name: taka-auth
+    type: application
+    urls:
+    - https://takasecure.github.io/repo/charts/taka-auth-1.0.0.tgz
+    version: 1.0.0
+  taka-backup:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-10-25T19:18:13.268758111+07:00"
+    description: A Helm chart for Kubernetes
+    digest: baeeb14d36ac08b5d13bcbdfd17f0d7c18710f97eb2bc127089cd279eb776c8f
+    name: taka-backup
+    type: application
+    urls:
+    - https://takasecure.github.io/repo/charts/taka-backup-1.0.0.tgz
+    version: 1.0.0
+  taka-crypto:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-10-25T19:18:13.269229697+07:00"
+    description: A Helm chart for Kubernetes
+    digest: 5bdf2134936f36114260daca2f1a8a99e4f5679305b16959c1e4f22728a269ca
+    name: taka-crypto
+    type: application
+    urls:
+    - https://takasecure.github.io/repo/charts/taka-crypto-1.0.0.tgz
+    version: 1.0.0
+  taka-dispatch:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-10-25T19:18:13.269640355+07:00"
+    description: A Helm chart for Kubernetes
+    digest: 7f858086b8056d036f544fae938dc73b1b479a43351bfd5abc240275df4700d6
+    name: taka-dispatch
+    type: application
+    urls:
+    - https://takasecure.github.io/repo/charts/taka-dispatch-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-10-25T19:18:13.267117734+07:00"

@@ -1,0 +1,35 @@
+{{- if .Values.persistence.enabled }}
+{{- $dot := . }}
+{{- range $key, $value := .Values.persistence.data }}
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ $value.name }}-taka-backup
+{{- with $value.annotations  }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+  labels:
+    app: {{ include "taka-backup.fullname" $ }}
+    chart: "{{ $dot.Chart.Name }}-{{ $dot.Chart.Version }}"
+    release: "{{ $dot.Release.Name }}"
+    heritage: "{{ $dot.Release.Service }}"
+spec:
+  accessModes:
+    - {{ $value.accessMode | quote }}
+  {{- if $value.volumeMode }}
+  volumeMode: {{ $value.volumeMode | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $value.size | quote }}
+{{- if $value.storageClass }}
+{{- if (eq "-" $value.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: "{{ $value.storageClass }}"
+{{- end }}
+{{- end }}
+---
+{{- end }}
+{{- end }}
