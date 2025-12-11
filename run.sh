@@ -930,6 +930,145 @@ EOF
     echo -e "${GREEN}backup-service.env created successfully${NC}"
 }
 
+
+save_general_service_env() {
+    echo -e "${BLUE}Creating general-service.env...${NC}"
+    cat > $INSTALL_DIR/general-service.env <<EOF
+# Konfigurasi untuk General Service (sesuaikan jika perlu)
+BROKER_ADDRESS=127.0.0.1
+BROKER_DRIVER=nats
+BROKER_USERNAME=nats
+BROKER_PASSWORD=123321
+BROKER_PORT=4222
+
+CACHE_ADDRESS=127.0.0.1
+CACHE_DRIVER=redis
+CACHE_USERNAME=
+CACHE_PASSWORD=
+CACHE_PORT=6379
+
+DATABASE_DRIVER=postgresql
+DATABASE_NAME=postgres
+DATABASE_ADDRESS=localhost
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=UqRw5iUg6T
+DATABASE_PORT=50231
+DATABASE_SSL_MODE=disable
+MIGRATION_VERSION=1
+
+DISCOVERY_ADDRESS=localhost
+DISCOVERY_DRIVER=mdns
+DISCOVERY_USERNAME=
+DISCOVERY_PASSWORD=
+DISCOVERY_PORT=8500
+
+MONITORING_ADDRESS=
+MONITORING_DRIVER=
+MONITORING_USERNAME=
+MONITORING_PASSWORD=
+MONITORING_PORT=8080
+
+SERVICE_ADDRESS=localhost
+SERVICE_NAME=takakrypt-masking-service
+SERVICE_PORT=8186
+SERVICE_VERSION=1
+SERVICE_JWT_SECRET=secret
+
+SENTRY_ADDRESS=
+SENTRY_USERNAME=
+SENTRY_PORT=
+SENTRY_PASSWORD=
+SENTRY_ENV=development
+
+MICRO_CLIENT=grpc
+
+BUCKET_DRIVER=s3
+BUCKET_CONTAINER=
+
+MINIO_PORT=
+MINIO_ACCESS_KEY=
+MINIO_SECRET_KEY=
+MINIO_REGION=
+MINIO_ADDRESS=
+
+S3_ADDRESS=
+S3_ACCESS_KEY=
+S3_SECRET_KEY=
+S3_REGION=
+S3_BUCKET=
+
+SERVER_TYPE=graphql
+
+LOCK_SERVICE_HOST=localhost:8185
+TOKENIZE_SERVICE_HOST=localhost:8187
+CRYPTO_SERVICE_HOST=localhost:8182
+AUTH_SERVICE_HOST=localhost:8181
+MASTER_DATA_SERVICE_HOST=localhost:8183
+TRANSACTION_SERVICE_HOST=localhost:8184
+MUSO_APP_DOMAIN_URL=http://localhost:8080/
+# AES_KEY='FIqqTJAXb/FbwkXQL2WalL35L317aLQ='
+GQL_QUERY_DISABLE_INTROSPECTION=false
+OPEN_TELEMETRY_COLLECTOR_URL='192.168.50.20:30345'
+MONGO_CONNECTION='mongodb://localhost:27017'
+
+JAEGER_REPORTER_LOG_SPANS=true
+JAEGER_SAMPLER_TYPE=const
+JAEGER_SAMPLER_PARAM=1
+JAEGER_SERVICE_NAME=xti-gateway-go
+JAEGER_AGENT_HOST=localhost
+JAEGER_AGENT_PORT=6831
+
+APP_DOMAIN_URL=http://localhost:3000
+
+AES_KEY='FIqqTJAXb/FbwkXQL2WalL35L317aLQ='
+AES_KEY_API='7lw9cYvBy06SnVAk0nnBYnCTsRmRMOwO'
+USER_KEY_EXPIRATION=24
+
+CORS_ALLOW_ORIGINS=*
+
+TWEAK_KEY_API=T9xQ2vLm
+
+JSON_STORAGE_PATH=/opt/app/json/db.json
+VAULT_PATH='./opt/app/vault'
+LOG_PATH='./opt/app/log'
+
+SERVICE_ENV=development
+LOG_LEVEL=error
+LOG_CAPACITY=53687091200
+
+SYNC_ENABLED=true
+INSTANCE_ID=B
+DISPATCHER_ADDR=localhost:9080
+SYNC_RETRY_MAX=3
+SYNC_RETRY_DELAY=2s
+SYNC_TIMEOUT=5s
+HEALTH_CHECK_FREQ=30s
+DB_PATH=master
+APP_NAME=takakrypt-masking-service
+APP_VERSION=1.0.0
+HTTP_PORT=8080
+GRPC_SYNC_PORT=9094
+SEEDING_MASTER_DATA=false
+KEY_EXPIRATION_CHECK_TIME=24
+
+SMTP_HOST='smtp-mail.outlook.com'
+SMTP_PASSWORD='H3lloWorld08!#'
+SMTP_USERNAME='hi@takasecure.com'
+SMTP_PORT=587
+SMTP_SENDER='hi@takasecure.com'
+SMTP_SENDER_NAME="[No-Reply] Taka Secure Indonesia"
+SMTP_TLS=true
+
+SEND_EMAIL=false
+SCHEDULER_NOTIFIKASI=false
+
+# IGNORE_LICENSE=true
+
+RUN_MIGRATION=true
+EOF
+    echo -e "${GREEN}general-service.env created successfully${NC}"
+}
+
 # Function to create docker-compose file
 create_docker_compose() {
     echo -e "${BLUE}Creating docker-compose.yml...${NC}"
@@ -1116,6 +1255,37 @@ services:
     networks:
       - backend
     restart: unless-stopped
+  
+  general-service:
+    image: admintaka/general-service:latest
+    container_name: general-service
+    ports:
+      - "8188:8188"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8188/health",
+        ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    env_file:
+      - $INSTALL_DIR/general-service.env
+    volumes:
+      # Mount host /proc for Linux host monitoring
+      # Note: On macOS, this mounts the Docker VM's /proc, not macOS host
+      # For macOS, use the macos-host-monitor.sh script to push host stats
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    networks:
+      - backend
 
 networks:
   backend:
@@ -1167,6 +1337,7 @@ install_app() {
     save_tokenize_env
     save_file_service_env    # <-- Ditambahkan
     save_backup_service_env  # <-- Ditambahkan
+    save_general_service_env # <-- baru Ditambahkan
 
 
     # Create docker-compose file
@@ -1198,6 +1369,7 @@ uninstall_app() {
     rm -f $INSTALL_DIR/nats.conf
     rm -f $INSTALL_DIR/file-service.env    # <-- Ditambahkan
     rm -f $INSTALL_DIR/backup-service.env  # <-- Ditambahkan
+    rm -f $INSTALL_DIR/general-service.env # <-- baru Ditambahkan
 
     # Remove SSL certificates
     rm -rf $INSTALL_DIR/ssl
